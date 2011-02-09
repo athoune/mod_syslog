@@ -1,0 +1,2 @@
+Syslog for Ejabberd
+===================
