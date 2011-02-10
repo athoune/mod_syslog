@@ -16,17 +16,30 @@
 	remove_connection/3
 ]).
 
-start(Host, _Opts) ->
+start(Host, Opts) ->
+	?INFO_MSG("options ~p", [Opts]),
+	?INFO_MSG("elements ~p", [element(2, lists:keyfind(modules, 1, Opts))]),
 	application:start(syslog),
 	syslog:send(ejabberd, info, "starting mod_syslog"),
-	ejabberd_hooks:add(user_available_hook, Host,
-		?MODULE, user_available, 50),
-	ejabberd_hooks:add(unset_presence_hook, Host,
-		?MODULE, presence_update, 50),
-	ejabberd_hooks:add(sm_register_connection_hook, Host,
-			?MODULE, register_connection, 50),
-	ejabberd_hooks:add(sm_remove_connection_hook, Host,
-		?MODULE, remove_connection, 50),
+	lists:foreach(fun(Elem)->
+		?INFO_MSG("element ~p", [Elem]),
+		case Elem of
+			connection ->
+				ejabberd_hooks:add(sm_register_connection_hook, Host,
+						?MODULE, register_connection, 50),
+				ejabberd_hooks:add(sm_remove_connection_hook, Host,
+					?MODULE, remove_connection, 50),
+					syslog:send(ejabberd, info, "mod_syslog enabling connection module");
+			presence ->
+				ejabberd_hooks:add(user_available_hook, Host,
+					?MODULE, user_available, 50),
+				ejabberd_hooks:add(unset_presence_hook, Host,
+					?MODULE, presence_update, 50),
+				syslog:send(ejabberd, info, "mod_syslog enabling presence module");
+			_ -> ok
+		end
+	end, element(2, lists:keyfind(modules, 1, Opts))),
+	
 	ok.
 
 stop(_Host) ->
@@ -49,7 +62,7 @@ register_connection(SID, JID, Info) ->
 	syslog:send(ejabberd, info, jlib:jid_to_string(JID) ++ io_lib:format(" open connection from ~p", [element(1,element(2,lists:keyfind(ip, 1, Info)))])),
 	ok.
 
-remove_connection(SID, JID, Info) ->
+remove_connection(SID, JID, _Info) ->
 	syslog:send(ejabberd, info, jlib:jid_to_string(JID) ++ " close connection" ++ io_lib:format(" ~p", [SID])),
 	%% ++ " close connection " ++ SID ++ " : " ++ Info),
 	ok.
