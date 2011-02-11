@@ -59,10 +59,13 @@ register_connection(SID, JID, Info) ->
 	?INFO_MSG("JID ~p", [JID]),
 	?INFO_MSG("Info ~p", [Info]),
 	%%dict:fetch(ip, Info)
-	syslog:send(ejabberd, info, jlib:jid_to_string(JID) ++ io_lib:format(" open connection from ~p", [element(1,element(2,lists:keyfind(ip, 1, Info)))])),
+	IP = element(1,element(2,lists:keyfind(ip, 1, Info))),
+	syslog:send(ejabberd, info, jlib:jid_to_string(JID) ++
+		io_lib:format(" open connection from ~B.~B.~B.~B", [element(1, IP), element(2, IP), element(3, IP), element(4, IP)])),
 	ok.
 
 remove_connection(SID, JID, _Info) ->
-	syslog:send(ejabberd, info, jlib:jid_to_string(JID) ++ " close connection" ++ io_lib:format(" ~p", [SID])),
+	syslog:send(ejabberd, info, jlib:jid_to_string(JID) ++ " close connection"),
+	%% ++ io_lib:format(" ~p", [SID])
 	%% ++ " close connection " ++ SID ++ " : " ++ Info),
 	ok.
