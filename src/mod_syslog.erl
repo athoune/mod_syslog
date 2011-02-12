@@ -4,7 +4,7 @@
 -behavior(gen_mod).
 
 -include("ejabberd.hrl").
--include_lib("syslog/src/syslog.hrl").
+-include_lib("syslog/include/syslog.hrl").
 -include("jlib.hrl").
 
 
