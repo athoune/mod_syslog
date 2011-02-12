@@ -4,6 +4,7 @@
 -behavior(gen_mod).
 
 -include("ejabberd.hrl").
+-include_lib("syslog/src/syslog.hrl").
 -include("jlib.hrl").
 
 
@@ -43,7 +44,7 @@ start(Host, Opts) ->
 	ok.
 
 stop(_Host) ->
-	syslog:send(ejabberd, info, "stopping mod_syslog"),
+	?SYSLOG_INFO(mod_syslog, "stopping mod_syslog"),
 	ok.
 
 user_available(#jid{luser = LUser, lserver = LServer} = _JID) ->
@@ -64,7 +65,7 @@ register_connection(SID, JID, Info) ->
 		io_lib:format(" open connection from ~B.~B.~B.~B", [element(1, IP), element(2, IP), element(3, IP), element(4, IP)])),
 	ok.
 
-remove_connection(SID, JID, _Info) ->
+remove_connection(_SID, JID, _Info) ->
 	syslog:send(ejabberd, info, jlib:jid_to_string(JID) ++ " close connection"),
 	%% ++ io_lib:format(" ~p", [SID])
 	%% ++ " close connection " ++ SID ++ " : " ++ Info),
