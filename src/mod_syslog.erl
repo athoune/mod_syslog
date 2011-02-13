@@ -18,19 +18,19 @@
 ]).
 
 start(Host, Opts) ->
-	?INFO_MSG("options ~p", [Opts]),
-	?INFO_MSG("elements ~p", [element(2, lists:keyfind(modules, 1, Opts))]),
 	application:start(syslog),
+	{syslog, SyslogOptions} = lists:keyfind(syslog, 1, Opts),
+	ok = syslog:settings(element(1, SyslogOptions), element(2, SyslogOptions), element(3, SyslogOptions)),
 	?SYSLOG_INFO(ejabberd, "starting mod_syslog", []),
 	lists:foreach(fun(Elem)->
 		?INFO_MSG("element ~p", [Elem]),
 		case Elem of
 			connection ->
 				ejabberd_hooks:add(sm_register_connection_hook, Host,
-						?MODULE, register_connection, 50),
+					?MODULE, register_connection, 50),
 				ejabberd_hooks:add(sm_remove_connection_hook, Host,
 					?MODULE, remove_connection, 50),
-					?SYSLOG_INFO(ejabberd, "mod_syslog enabling connection module", []);
+				?SYSLOG_INFO(ejabberd, "mod_syslog enabling connection module", []);
 			presence ->
 				ejabberd_hooks:add(user_available_hook, Host,
 					?MODULE, user_available, 50),

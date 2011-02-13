@@ -13,6 +13,6 @@ Config
 in ejabberd.cfg, in the modules section
 
 	 {mod_syslog, [
-		{syslog, {"localhost", 514}},
+		{syslog, {"localhost", 514, user}},
 		{modules, [presence, connection, muc]}
 		]},
