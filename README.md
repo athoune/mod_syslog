@@ -23,3 +23,8 @@ in ejabberd.cfg, in the modules section
 For _syslog_, you choose a server, a port, and a facility.
 
 For _modules_, you choose wich events are watched. For now, you can't watch muc events.
+
+Licence
+-------
+
+MIT 2011, © Mathieu Lecarme
